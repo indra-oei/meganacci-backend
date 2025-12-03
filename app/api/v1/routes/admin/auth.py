@@ -2,19 +2,21 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from app.core.security import verify_password, create_access_token
+from app.core.security import verify_password, create_access_token, create_refresh_token
 from app.core.database import get_db
 from app.core.response import api_response
 from app.core.dependencies import get_current_user
 
 from app.services.auth_service import AuthService
 from app.repositories.admin_repository import AdminRepository
+from app.repositories.admin_refresh_token_repository import AdminRefreshTokenRepository
 
 router = APIRouter()
 
 def get_auth_service(db: Session = Depends(get_db)):
-    repository = AdminRepository(db)
-    return AuthService(repository, verify_password, create_access_token)
+    admin_repo = AdminRepository(db)
+    refresh_repo = AdminRefreshTokenRepository(db)
+    return AuthService(admin_repo, refresh_repo, verify_password, create_access_token, create_refresh_token)
 
 @router.post("/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), service: AuthService = Depends(get_auth_service)):
@@ -22,7 +24,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), service: AuthService
     if not admin:
         return api_response(401, None, "Invalid credentials")
     
-    token = service.generate_token(admin)
+    token = service.generate_access_token(admin)
     return api_response(
         200, 
         {
