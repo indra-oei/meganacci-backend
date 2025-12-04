@@ -15,9 +15,9 @@ app.add_middleware(AdminAuthMiddleware)
 
 # Register CORS middleware
 origins = [
-    "http://localhost:3000",   # Next.js dev server
-    "http://127.0.0.1:3000",   # sometimes browsers resolve localhost differently
-    # add your production domain here later, e.g. "https://app.meganacci.com"
+    # "http://localhost:3000",   # Next.js dev server
+    # "http://127.0.0.1:3000",   # sometimes browsers resolve localhost differently
+    "https://meganacci.xyz"
 ]
 
 app.add_middleware(
