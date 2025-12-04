@@ -31,16 +31,21 @@ class WhitelistService:
         whitelists = []
         for sheet in workbook.worksheets:
             for idx, row in enumerate(sheet.iter_rows(min_row=1, values_only=True), start=1):
+                wallet_address, whitelist_type = row[0], row[1]
+
                 if not row[1]:
                     print(f"Null found at row {idx}: {row}")
+                    continue
+
                 whitelists.append({
-                    "wallet_address": row[0],
-                    "whitelist_type": row[1],
+                    "wallet_address": wallet_address.strip() if isinstance(wallet_address, str) else wallet_address,
+                    "whitelist_type": whitelist_type.strip() if isinstance(whitelist_type, str) else whitelist_type,
                     "created_by": self.current_user['id'],
                     "created_at": datetime.now()
                 })
 
         self.repository.add(whitelists)
+        # print(whitelists);
         return len(whitelists)
 
     def export_to_excel(self):
