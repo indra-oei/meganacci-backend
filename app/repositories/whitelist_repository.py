@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import insert
 from app.models.whitelist import Whitelist
@@ -10,9 +11,11 @@ class WhitelistRepository:
         return self.db.query(Whitelist).all()
 
     def get_by_wallet_address(self, wallet_address: str):
-        return self.db.query(Whitelist).filter(Whitelist.wallet_address == wallet_address).first()
+        lowercase_wallet = wallet_address.lower()
+        return self.db.query(Whitelist).filter(func.lower(Whitelist.wallet_address) == lowercase_wallet).first()
     
     def add(self, whitelists: list[dict]):
+        self.db.query(Whitelist).delete()
         stmt = insert(Whitelist).values(whitelists)
         stmt = stmt.on_conflict_do_nothing(
             index_elements=['wallet_address']
