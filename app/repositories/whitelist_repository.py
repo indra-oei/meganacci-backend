@@ -11,7 +11,7 @@ class WhitelistRepository:
         return self.db.query(Whitelist).all()
 
     def get_by_wallet_address(self, wallet_address: str):
-        lowercase_wallet = wallet_address.lower()
+        lowercase_wallet = wallet_address.lower().strip()
         return self.db.query(Whitelist).filter(func.lower(Whitelist.wallet_address) == lowercase_wallet).first()
     
     def add(self, whitelists: list[dict]):
